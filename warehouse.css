@@ -1,0 +1,28 @@
+
+header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 40px;
+	border-bottom: 1px solid black;
+	margin: 0 0 20px 0;
+}
+.orders-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+.row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+	justify-content: flex-start;
+	border: 1px solid black;
+	padding: 5px;
+}
+.row p, .row-button {
+	width: 150px;
+}
