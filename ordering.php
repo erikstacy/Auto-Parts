@@ -47,8 +47,10 @@
 				$prodQuantities = array();
 
 				$arrayCount = 0;
+				$didBuySomething = false;
 				for ($x = 1; $x <= 149; $x++) {
 					if (!empty($_POST["quantity" . $x])) {
+						$didBuySomething = true;
 						$legacyResult = queryLegacyDatabase("SELECT price, weight, description FROM parts WHERE number=$x");
 						$legacyRow = $legacyResult->fetch();
 
@@ -61,7 +63,9 @@
 					}
 				}
 
-				insertOrder($name, $address, $email, $prodQuantities);
+				if ($didBuySomething == true) {
+				}
+					insertOrder($name, $address, $email, $prodQuantities);
 			}
 
 		?>
