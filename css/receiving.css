@@ -35,3 +35,9 @@ form {
 .row .description {
 	width: 300px;
 }
+.form-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}

@@ -26,3 +26,16 @@ header {
 .row p, .row-button {
 	width: 150px;
 }
+.item-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+	margin-bottom: 20px;
+}
+.item-detail {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	width: 300px;
+}
