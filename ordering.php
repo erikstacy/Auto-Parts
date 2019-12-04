@@ -48,9 +48,50 @@
 				$email = $_POST["email"];
 				$cc_number = $_POST["cc_number"];
 				$cc_expiration = $_POST["cc_expiration"];
-				$price = '10.00';
-				$vendor = 'auto-parts';
-				$trans = '666-987654321-666';
+				$prodQuantities = array();
+
+				$arrayCount = 0;
+				$didBuySomething = false;
+				$totalWeight = 0;
+				$subPrice = 0;
+
+				for ($x = 1; $x <= 149; $x++) {
+					if (!empty($_POST["quantity" . $x])) {
+						$didBuySomething = true;
+						$legacyResult = queryLegacyDatabase("SELECT price, weight, description FROM parts WHERE number=$x");
+						$legacyRow = $legacyResult->fetch();
+
+						$prodQuantities[$arrayCount][0] = $x;
+						$prodQuantities[$arrayCount][1] = $_POST["quantity" . $x];
+						$prodQuantities[$arrayCount][2] = $legacyRow[0];
+						$prodQuantities[$arrayCount][3] = $legacyRow[1];
+						$prodQuantities[$arrayCount][4] = $legacyRow[2];
+
+						$prodPrice = $prodQuantities[$arrayCount][2];
+						$prodWeight = $prodQuantities[$arrayCount][3];
+						$quantity = $prodQuantities[$arrayCount][1];
+
+						$tempPrice = $prodPrice * $quantity;
+						$tempWeight = $prodWeight * $quantity;
+
+						$totalWeight += $tempWeight;
+						$subPrice += $tempPrice;
+						$arrayCount++;
+					}
+				}
+
+				$shipping = getShippingPrice($totalWeight);
+				$total = $subPrice + $shipping;
+
+				$ourResult = queryOurDatabase("SELECT * FROM orders");
+				$orderNumber = $ourResult->num_rows;
+				$orderNumber += 1;
+				$orderNumber = str_pad($orderNumber, 9, '0', STR_PAD_LEFT);
+
+				// Get credit card authorization
+				$price = $total;
+				$vendor = 'gunslinger-joe';
+				$trans = '666-' . $orderNumber . '-666';
 				$url = "http://blitz.cs.niu.edu/CreditCard/";
 				$data = array(
 					'vendor' => $vendor,
@@ -69,25 +110,13 @@
 				);
 				$context = stream_context_create($options);
 				$result = file_get_contents($url, false, $context);
-				$prodQuantities = array();
-
-				$arrayCount = 0;
-				$didBuySomething = false;
-				for ($x = 1; $x <= 149; $x++) {
-					if (!empty($_POST["quantity" . $x])) {
-						$didBuySomething = true;
-						$legacyResult = queryLegacyDatabase("SELECT price, weight, description FROM parts WHERE number=$x");
-						$legacyRow = $legacyResult->fetch();
-
-						$prodQuantities[$arrayCount][0] = $x;
-						$prodQuantities[$arrayCount][1] = $_POST["quantity" . $x];
-						$prodQuantities[$arrayCount][2] = $legacyRow[0];
-						$prodQuantities[$arrayCount][3] = $legacyRow[1];
-						$prodQuantities[$arrayCount][4] = $legacyRow[2];
-						$arrayCount++;
-					}
+				$auth = 'authorization';
+				$pos = strpos($result, $auth);
+				if ($pos === false) {
+					echo "<div width=\"100%\">Not Authorized!</div>";
 				}
-				if ($didBuySomething == true) {
+
+				if ($didBuySomething == true && $pos == true) {
 					insertOrder($name, $address, $email, $prodQuantities);
 				}
 			}
