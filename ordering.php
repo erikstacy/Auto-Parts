@@ -24,11 +24,11 @@
 			</div>
 			<div class="input-field">
 				<label for="cc_number">CC Number</label>
-				<input type="text" name="cc_number" placeholder="Type here...">
+				<input type="text" name="cc_number" placeholder="XXXX XXXX XXXX XXXX">
 			</div>
 			<div class="input-field">
 				<label for="cc_expiration">CC Expiration Date</label>
-				<input type="text" name="cc_expiration" placeholder="Type here...">
+				<input type="text" name="cc_expiration" placeholder="mm/YYYY">
 			</div>
 			<button type="submit">Submit</button>
 		</div>
@@ -39,11 +39,36 @@
 
 			if (!empty($_POST["name"]) and 
 				!empty($_POST["address"]) and
-				!empty($_POST["email"])
+				!empty($_POST["email"]) and
+				!empty($_POST["cc_number"]) and
+				!empty($_POST["cc_expiration"])
 				) {
 				$name = $_POST["name"];
 				$address = $_POST["address"];
 				$email = $_POST["email"];
+				$cc_number = $_POST["cc_number"];
+				$cc_expiration = $_POST["cc_expiration"];
+				$price = '10.00';
+				$vendor = 'auto-parts';
+				$trans = '666-987654321-666';
+				$url = "http://blitz.cs.niu.edu/CreditCard/";
+				$data = array(
+					'vendor' => $vendor,
+					'trans' => $trans,
+					'cc' => $cc_number,
+					'name' => $name,
+					'exp' => $cc_expiration,
+					'amount' => $price
+				);
+				$options = array(
+					'http' => array(
+						'header' => array('Content-type: application/json', 'Accept: application/json'),
+						'method' => 'POST',
+						'content' => json_encode($data)
+					)
+				);
+				$context = stream_context_create($options);
+				$result = file_get_contents($url, false, $context);
 				$prodQuantities = array();
 
 				$arrayCount = 0;
@@ -62,12 +87,10 @@
 						$arrayCount++;
 					}
 				}
-
 				if ($didBuySomething == true) {
-				}
 					insertOrder($name, $address, $email, $prodQuantities);
+				}
 			}
-
 		?>
 
 		<?php
