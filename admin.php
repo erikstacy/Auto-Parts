@@ -78,9 +78,9 @@
 					</select>
 				</div>
 				<div class="input-field">
-					<label for="start-price">Price Range</label>
+					<label for="start-price">Start Price</label>
 					<input type="number" name="start-price" step="0.01">
-					<label for="end-price">End Date</label>
+					<label for="end-price">End Price</label>
 					<input type="number" name="end-price" step="0.01">
 				</div>
 				<button type="submit">Search</button>

@@ -115,7 +115,7 @@
 				if ($pos === false) {
 					echo "<div width=\"100%\">Not Authorized!</div>";
 				}
-
+				
 				if ($didBuySomething == true && $pos == true) {
 					insertOrder($name, $address, $email, $prodQuantities);
 				}

@@ -6,7 +6,7 @@ if (!function_exists('getOurDatabase')) {
 			try {
 				$servername = "localhost";
 				$username = "root";
-				$password = "softwareengineering";
+				$password = "password";
 				$dbname = "newdb";
 				// Create connection
 				$conn = new mysqli($servername, $username, $password, $dbname);
@@ -134,6 +134,7 @@ if (!function_exists('getOurDatabase')) {
 			$subPrice = 0;
 
 			for ($i = 0; $i < count($ProdQuantities); $i++) {
+
 				insertOurDatabase("INSERT INTO orderprod (
 					OrderId,
 					ProdId,
@@ -180,6 +181,39 @@ if (!function_exists('getOurDatabase')) {
 				SET TotalPrice=$total
 				WHERE OrderId=$OrderId;
 			");
+	
+			$orderResult = queryOurDatabase("SELECT * FROM orders WHERE OrderId=$OrderId");
+			$orderRow = $orderResult->fetch_assoc();
+			$ourResult = queryOurDatabase("SELECT * FROM orderprod WHERE OrderId=$OrderId");
+			$ourRow = $ourResult->fetch_all();
+
+			$emailBody = emailBody($orderRow, $ourRow);
+
+			require '/usr/share/php/libphp-phpmailer/class.phpmailer.php';
+			require '/usr/share/php/libphp-phpmailer/class.smtp.php';
+			$mail = new PHPMailer;
+			$mail->setFrom('admin@example.com');
+			$mail->addAddress($CustEmail);
+			$mail->Subject = 'Auto Parts Order Confirmation';
+			$mail->isHtml(true);
+			$mail->Body = $emailBody;
+			$mail->IsSMTP();
+			$mail->SMTPSecure = 'ssl';
+			$mail->Host = 'ssl://smtp.gmail.com';
+			$mail->SMTPAuth = true;
+			$mail->Port = 465;
+
+			//Set your existing gmail address as user name
+			$mail->Username = 'orderingGroup9A@gmail.com';
+
+			//Set the password of your gmail address here
+			$mail->Password = 'cs467pass';
+			if(!$mail->send()) {
+			echo 'Email is not sent.';
+			echo 'Email error: ' . $mail->ErrorInfo;
+			} else {
+			echo 'Email has been sent.';
+			}
 		}
 	}
 
@@ -229,6 +263,61 @@ if (!function_exists('getOurDatabase')) {
 					echo "<div class=\"order-button\"><button><a href=\"./print.php?details=$x[0]\">Details</a></button></div>";
 				echo "</div>";
 			}
+		}
+	}
+
+	if (!function_exists('emailBody')) {
+		function emailBody($orderRow, $ourRow) {
+			$body = "<h1>Invoice</h1>";
+			$body .= "<div>Name: <b>" . $orderRow["CustName"] . "</b></div>";
+			$body .= "<div>Address: <b>" . $orderRow["CustAddress"] . "</b></div>";
+			$body .= "<div>Email: <b>" . $orderRow["CustEmail"] . "</b></div>";
+			$body .= "<hr>";
+			$i = 1;
+			$subtotal = 0;
+			$totalWeight = 0;
+			foreach($ourRow as $x) {
+				$itemTotal = $x[4] * $x[6];
+				$subtotal += $itemTotal;
+				$totalWeight += ($x[5] * $x[6]);
+				$body .= "<div class=\"item-row\">";
+				$body .= "<div class=\"item-detail\"><b>Item Name</b></div>";
+					$body .= "<div class=\"item-detail\">$x[3]</div>";
+				$body .= "<div class=\"item-detail\"><b>Item Price</b></div>";
+					$body .= "<div class=\"item-detail\">\$$x[4]</div>";
+				$body .= "<div class=\"item-detail\"><b>Quantity</b></div>";
+					$body .= "<div class=\"item-detail\">$x[6]</div>";
+				$body .= "<div class=\"item-detail\"><b>Total Item Price</b></div>";
+					$body .= "<div class=\"item-detail\">\$$itemTotal</div>";
+					$body .= "<br>";
+				$body .= "</div>";
+				$i++;
+			}
+			$body .= "<hr>";
+			$outputSub = number_format((float)$subtotal, 2, '.', '');
+			$body .= "<div class=\"item-row\">";
+				$body .= "<div class=\"item-detail\"></div>";
+				$body .= "<div class=\"item-detail\"></div>";
+				$body .= "<div class=\"item-detail\"><b>Subtotal</b></div>";
+				$body .= "<div class=\"item-detail\">\$$outputSub</div>";
+			$body .= "</div>";
+			$shippingPrice = getShippingPrice($totalWeight);
+			$body .= "<div class=\"item-row\">";
+				$body .= "<div class=\"item-detail\"></div>";
+				$body .= "<div class=\"item-detail\"></div>";
+				$body .= "<div class=\"item-detail\"><b>Shipping and Handling</b></div>";
+				$body .= "<div class=\"item-detail\">\$$shippingPrice</div>";
+			$body .= "</div>";
+			$totalPrice = $subtotal + $shippingPrice;
+			$outputTotal = number_format((float)$totalPrice, 2, '.', '');
+			$body .= "<div class=\"item-row\">";
+				$body .= "<div class=\"item-detail\"></div>";
+				$body .= "<div class=\"item-detail\"></div>";
+				$body .= "<div class=\"item-detail\"><b>Total</b></div>";
+				$body .= "<div class=\"item-detail\">\$$outputTotal</div>";
+			$body .= "</div>";
+
+			return $body;
 		}
 	}
 
