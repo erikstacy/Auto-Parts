@@ -1,12 +1,21 @@
 
+body {
+	background-color: #222831;
+}
+body p, body label {
+	color: white;
+}
 header {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 40px;
-	border-bottom: 1px solid black;
 	margin: 0 0 20px 0;
+	background-color: #29A19C;
+}
+header h1 {
+	color: white;
 }
 form {
 	display: flex;
@@ -31,12 +40,17 @@ form {
 	justify-content: flex-start;
 	border: 1px solid black;
 	padding: 5px;
+	background-color: #393E46;
 }
 .row input, .row p {
 	margin: 0 5px;
 }
 .row p {
 	width: 150px;
+	color: white;
+}
+#row-header {
+	background-color: #29A19C;
 }
 input[type=number] {
 	width: 150px;
@@ -62,6 +76,10 @@ input[type=number] {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	background-color: #29A19C;
+}
+.orders-list p, .orders-list label {
+	color: #222831;
 }
 .order {
 	display: flex;
@@ -77,4 +95,16 @@ input[type=number] {
 .line {
 	border: 1px solid black;
 	width: 100%;
+}
+#orange {
+	background-color: #29A19C;
+}
+#grey {
+	background-color: #393E46;
+}
+#orange p, #orange label {
+	color: #222831;
+}
+#grey p, #grey label {
+	color: #F2F0E6;
 }

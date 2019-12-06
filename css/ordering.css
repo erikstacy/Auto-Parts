@@ -1,12 +1,47 @@
 
+body {
+	background-color: #222831;
+}
 header {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 40px;
-	border-bottom: 1px solid black;
 	margin: 0 0 20px 0;
+	background-color: #29A19C;
+}
+header h1 {
+	color: #222831;
+}
+.customer-info {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin: auto;
+	width: 500px;
+	padding: 20px;
+	border-radius: 10px;
+	background-color: #393E46;
+	margin-bottom: 20px;
+}
+.input-field {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+.input-field label {
+	margin: 0 10px 0 0;
+	color: #F2F0E6;
+}
+.items-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 .item {
 	display: flex;
@@ -14,7 +49,8 @@ header {
 	align-items: center;
 	justify-content: space-around;
 	margin: 0 0 20px 0;
-	border: 1px solid black;
+	border-radius: 10px;
+	width: 900px;
 }
 .item-section {
 	display: flex;
@@ -22,18 +58,18 @@ header {
 	justify-content: center;
 	align-items: center;
 }
-.customer-info {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+.item-section p, .items-section label {
+	font-size: 18px;
 }
-.input-field {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
+#orange {
+	background-color: #29A19C;
 }
-.input-field label {
-	margin: 0 10px 0 0;
+#grey {
+	background-color: #393E46;
+}
+#orange p, #orange label {
+	color: #222831;
+}
+#grey p, #grey label {
+	color: #F2F0E6;
 }

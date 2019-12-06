@@ -1,12 +1,15 @@
 
+body {
+	background-color: #222831;
+}
 header {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 40px;
-	border-bottom: 1px solid black;
 	margin: 0 0 20px 0;
+	background-color: #29A19C;
 }
 form {
 	display: flex;
@@ -40,4 +43,7 @@ form {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+}
+.form-container label {
+	color: white;
 }
