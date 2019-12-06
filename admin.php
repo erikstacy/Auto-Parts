@@ -11,7 +11,6 @@
 		<form method="GET" name="updateWeight">
 			<?php
 			include("database.php");
-
 				if (!empty($_GET) AND array_key_exists("weight1", $_GET) == true) {
 					$sql = "SELECT * from orders";
 					$ourResult = queryOurDatabase("SELECT * FROM shipping");
@@ -29,10 +28,8 @@
 						$count++;
 					}
 				}
-
 				// Create paramaters
 				$weightInfo = array();
-
 				$ourResult = queryOurDatabase("SELECT * FROM shipping");
 				$ourRow = $ourResult->fetch_all();
 				$rows = $ourResult->num_rows;
@@ -42,9 +39,8 @@
 					$weightInfo[$count][1] = $x[2];
 					$count++;
 				}
-
 			    echo "<p>Weight Brackets</p>";
-				echo "<div class=\"row\">";
+				echo "<div class=\"row\" id=\"row-header\">";
 					echo "<p>Weight</p>";
 					echo "<p>Price</p>";
 				echo "</div>";
@@ -95,7 +91,6 @@
 				</div>
 				<?php
 				include("database.php");
-
 					if (empty($_GET)) {
 						$sql = "SELECT * from orders";
 					} elseif (array_key_exists("status", $_GET) == false) {
@@ -103,7 +98,6 @@
 					} else {
 						$changed = 0;
 						$sql = "SELECT * FROM orders WHERE ";
-
 						if ($_GET["status"] == "authorized") {
 							if ($changed != 0) {
 								$sql .= " AND ";
@@ -144,9 +138,7 @@
 							//$sql .= "Date BETWEEN " . $startDate . " AND " . $endDate . " ";
 							$sql .= "Date>=\"" . $startDate . "\" AND Date<=\"" . $endDate . "\" ";
 						}
-
 					}
-
 					displayAdminRow($sql);
 				?>
 			</div>

@@ -1,94 +1,79 @@
-
 <?php
-
 if (!function_exists('getOurDatabase')) {
 	function getOurDatabase() {
 			try {
 				$servername = "localhost";
 				$username = "root";
-				$password = "password";
+				$password = "softwareengineering";
 				$dbname = "newdb";
 				// Create connection
 				$conn = new mysqli($servername, $username, $password, $dbname);
 				return $conn;
-
 			} catch(PDOexception $e) {
 				echo "<div>Connection to our database failed: ".$e->getMessage();
 			}
 	}
 }
-
 	if (!function_exists('queryLegacyDatabase')) {
 		function queryLegacyDatabase($sql) {
 			try {
 				$dsn = "mysql:host=er7lx9km02rjyf3n.cbetxkdyhwsb.us-east-1.rds.amazonaws.com;dbname=b25oudnru9u3blk4";
 				$pdo = new PDO($dsn, "rs0czd6o8w8e8r3j", "w1ffboir25orrcs4");
-
 				$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
 				$rows = $pdo->query($sql);
 				return $rows;
-
 			} catch(PDOexception $e) {
 				echo "<div>Connection to legacy database failed: ".$e->getMessage();
 			}
 		}
 	}
-
 	if (!function_exists('queryOurDatabase')) {
 		function queryOurDatabase($sql) {
 			try {
 				$conn = getOurDatabase();
-
 				$result = $conn->query($sql);
 				return $result;
-
 			} catch(PDOexception $e) {
 				echo "<div>Connection to our database failed: ".$e->getMessage();
 			}
 		}
 	}
-
 	if (!function_exists('insertOurDatabase')) {
 		function insertOurDatabase($sql) {
 			try {
 				$conn = getOurDatabase();
-
 				if ($conn->query($sql)) {
 					return $last_id = mysqli_insert_id($conn);
 				}
-
 			} catch(PDOexception $e) {
 				echo "<div>Connection to our database failed: ".$e->getMessage();
 			}
 		}
 	}
-
 	if (!function_exists('modifyOurDatabase')) {
 		function modifyOurDatabase($sql) {
 			try {
 				$conn = getOurDatabase();
-
 				if ($conn->query($sql)) {
 				}
-
 			} catch(PDOexception $e) {
 				echo "<div>Connection to our database failed: ".$e->getMessage();
 			}
 		}
 	}
-
 	if (!function_exists('displayOrderRow')) {
 		function displayOrderRow() {
-
 			$legacyResult = queryLegacyDatabase("SELECT * FROM parts");
-
+			$count = 1;
 			foreach($legacyResult as $x) {
 				$prodid = $x[0];
 				$ourResult = queryOurDatabase("SELECT * FROM inventory WHERE ProdId=$prodid");
 				$ourRow = $ourResult->fetch_assoc();
-
-				echo "<div class=\"item\">";
+				if (($count % 2) == 0) {
+					echo "<div class=\"item\" id=\"grey\">";
+				} else {
+					echo "<div class=\"item\" id=\"orange\">";
+				}
 					echo "<div class=\"item-section\">";
 						echo "<img src=\"" . $x[4] . "\" />";
 					echo "</div>";
@@ -104,13 +89,12 @@ if (!function_exists('getOurDatabase')) {
 						echo "<input type=\"text\" placeholder=\"0\" size=\"1\" name=\"quantity" . $ourRow["ProdId"] . "\">";
 					echo "</div>";
 				echo "</div>";
+				$count++;
 			}
 		}
 	}
-
 	if (!function_exists('insertOrder')) {
 		function insertOrder($CustName, $CustAddress, $CustEmail, $ProdQuantities) {
-
 			/* Insert Custom Dates
 			$date = "2012-03-03";
 			$date = date("Y-m-d", strtotime($date));
@@ -129,12 +113,9 @@ if (!function_exists('getOurDatabase')) {
 					\"" . date("Y/m/d") . "\"
 				)
 			");
-
 			$totalWeight = 0;
 			$subPrice = 0;
-
 			for ($i = 0; $i < count($ProdQuantities); $i++) {
-
 				insertOurDatabase("INSERT INTO orderprod (
 					OrderId,
 					ProdId,
@@ -151,30 +132,23 @@ if (!function_exists('getOurDatabase')) {
 						\"" . $ProdQuantities[$i][4] . "\"
 					)
 				");
-
 				$ourResult = queryOurDatabase("SELECT * FROM inventory WHERE ProdId=\"" . $ProdQuantities[$i][0] . "\"");
 				$ourRow = $ourResult->fetch_assoc();
 				$newQuantity = $ourRow["QuantityAvail"] - $ProdQuantities[$i][1];
-
 				queryOurDatabase("UPDATE inventory
 					SET QuantityAvail=$newQuantity
 					WHERE ProdId=" . $ourRow["ProdId"] . ";
 				");
-
 				$ourResult = queryOurDatabase("SELECT * FROM orderprod WHERE OrderId=\"$OrderId\" AND ProdId=\"" . $ProdQuantities[$i][0] . "\"");
 				$ourRow = $ourResult->fetch_assoc();
-
 				$prodPrice = $ourRow["ProdPrice"];
 				$prodWeight = $ourRow["ProdWeight"];
 				$quantity = $ourRow["Quantity"];
-
 				$tempPrice = $prodPrice * $quantity;
 				$tempWeight = $prodWeight * $quantity;
-
 				$totalWeight += $tempWeight;
 				$subPrice += $tempPrice;
 			}
-
 			$shipping = getShippingPrice($totalWeight);
 			$total = $subPrice + $shipping;
 			$updateTotal = queryOurDataBase("UPDATE orders
@@ -186,9 +160,7 @@ if (!function_exists('getOurDatabase')) {
 			$orderRow = $orderResult->fetch_assoc();
 			$ourResult = queryOurDatabase("SELECT * FROM orderprod WHERE OrderId=$OrderId");
 			$ourRow = $ourResult->fetch_all();
-
 			$emailBody = emailBody($orderRow, $ourRow);
-
 			require '/usr/share/php/libphp-phpmailer/class.phpmailer.php';
 			require '/usr/share/php/libphp-phpmailer/class.smtp.php';
 			$mail = new PHPMailer;
@@ -202,10 +174,8 @@ if (!function_exists('getOurDatabase')) {
 			$mail->Host = 'ssl://smtp.gmail.com';
 			$mail->SMTPAuth = true;
 			$mail->Port = 465;
-
 			//Set your existing gmail address as user name
 			$mail->Username = 'orderingGroup9A@gmail.com';
-
 			//Set the password of your gmail address here
 			$mail->Password = 'cs467pass';
 			if(!$mail->send()) {
@@ -216,13 +186,10 @@ if (!function_exists('getOurDatabase')) {
 			}
 		}
 	}
-
 	if (!function_exists('displayWarehouseRow')) {
 		function displayWarehouseRow() {
-
 			$ourResult = queryOurDatabase("SELECT * FROM orders WHERE Status=\"Authorized\"");
 			$ourRow = $ourResult->fetch_all();
-
 			foreach($ourRow as $x) {
 				echo "<div class=\"row\">";
 					echo "<p>" . $x[0] . "</p>";
@@ -234,12 +201,10 @@ if (!function_exists('getOurDatabase')) {
 			}
 		}
 	}
-
 	if (!function_exists('getShippingPrice')) {
 		function getShippingPrice($totalWeight) {
 			$ourResult = queryOurDatabase("SELECT * FROM shipping");
 			$ourRow = $ourResult->fetch_all();
-
 			foreach ($ourRow as $x) {
 				if ($x[1] >= $totalWeight) {
 					return $x[1];
@@ -248,24 +213,27 @@ if (!function_exists('getOurDatabase')) {
 			return $x[1];
 		}
 	}
-
 	if (!function_exists('displayAdminRow')) {
 		function displayAdminRow($sql) {
 			$ourResult = queryOurDatabase($sql);
 			$ourRow = $ourResult->fetch_all();
-
+			$count = 1;
 			foreach ($ourRow as $x) {
-				echo "<div class=\"order\">";
+				if (($count % 2) == 0) {
+					echo "<div class=\"order\" id=\"orange\">";
+				} else {
+					echo "<div class=\"order\" id=\"grey\">";
+				}
 					echo "<p>" . $x[0] . "</p>";
 					echo "<p>" . $x[4] . "</p>";
 					echo "<p>" . $x[5] . "</p>";
 					echo "<p>$" . $x[6] . "</p>";
 					echo "<div class=\"order-button\"><button><a href=\"./print.php?details=$x[0]\">Details</a></button></div>";
 				echo "</div>";
+				$count++;
 			}
 		}
 	}
-
 	if (!function_exists('emailBody')) {
 		function emailBody($orderRow, $ourRow) {
 			$body = "<h1>Invoice</h1>";
@@ -316,9 +284,7 @@ if (!function_exists('getOurDatabase')) {
 				$body .= "<div class=\"item-detail\"><b>Total</b></div>";
 				$body .= "<div class=\"item-detail\">\$$outputTotal</div>";
 			$body .= "</div>";
-
 			return $body;
 		}
 	}
-
 ?>
